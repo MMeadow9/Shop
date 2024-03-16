@@ -15,7 +15,7 @@ class Card(SqlAlchemyBase):
     cash            INT         Баланс карты
 
     status          STR         Статус карты (Usual, Black, Silver, Gold, Platinum),
-                               позволяющий получить кэшбэк от покупок (0%, 2%, 5%, 9%, 15%)
+                               позволяющий получить кэшбэк от покупок (0%, 3%, 8%, 13%, 20%)
     """
     __tablename__ = 'cards'
 
