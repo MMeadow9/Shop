@@ -17,7 +17,7 @@ class Card(SqlAlchemyBase):
     status          STR         Статус карты (Usual, Black, Silver, Gold, Platinum),
                                позволяющий получить кэшбэк от покупок (0%, 2%, 5%, 9%, 15%)
     """
-    __tablename__ = 'users'
+    __tablename__ = 'cards'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     number = sqlalchemy.Column(sqlalchemy.String)
