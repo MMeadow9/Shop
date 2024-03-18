@@ -35,11 +35,11 @@ products = [
 ]
 
 cards = [
-    [get_random_number(16), get_random_number(4), get_random_number(3), 5000, "Usual"],
-    [get_random_number(16), get_random_number(4), get_random_number(3), 1000, "Usual"],
-    [get_random_number(16), get_random_number(4), get_random_number(3), 50000, "Silver"],
-    [get_random_number(16), get_random_number(4), get_random_number(3), 50, "Usual"],
-    [get_random_number(16), get_random_number(4), get_random_number(3), 450000, "Platinum"]
+    [get_random_number(16), get_random_number(4), get_random_number(3), 5000, "Usual", "1"],
+    [get_random_number(16), get_random_number(4), get_random_number(3), 1000, "Usual", "1"],
+    [get_random_number(16), get_random_number(4), get_random_number(3), 50000, "Silver", "13"],
+    [get_random_number(16), get_random_number(4), get_random_number(3), 50, "Usual", "1"],
+    [get_random_number(16), get_random_number(4), get_random_number(3), 450000, "Platinum", "1235"]
 ]
 
 app = Flask(__name__)
@@ -96,6 +96,7 @@ def load_data():
         card.code = data[2]
         card.cash = data[3]
         card.status = data[4]
+        card.statuses = data[5]
 
         db_sess.add(card)
 
@@ -166,6 +167,7 @@ def reg():
         card.code = form.card_code.data
         card.cash = 0
         card.status = "Usual"
+        card.status = "1"
 
         db_sess.add(card)
 
@@ -206,11 +208,26 @@ def view_advertisement():
     db_sess = create_session()
 
     cash = choice(cashs)
-    db_sess.query(Card).filter(Card.id == current_user.card).first().cash += cash
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+    card.cash += cash * {"Usual": 1, "Black": 1, "Silver": 1.05, "Gold": 1.15, "Platinum": 1.3}[card.status]
+    card.cash = round(card.cash, 2)
 
     db_sess.commit()
 
     return redirect("/")
+
+
+@login_required
+@app.route("/update_card/<int:num>")
+def update_card(num: int):
+    global_init("db/blogs.db")
+
+    db_sess = create_session()
+
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+    status = {status: index for index, status in enumerate("Usual Black Silver Gold Platinum".split())}[card.status]
+
+    return render_template("update_card.html", title="Данные карты", card=card, status=status, num=num)
 
 
 print(sum(cashs) / len(cashs))
