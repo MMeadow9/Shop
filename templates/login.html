@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %} Регистрация {% endblock %}
+
+{% block body %}
+
+    <form action="" method="post" novalidate>
+        <div>
+            {{ form.csrf_token }}
+        </div>
+        {% for field in form if field.name != 'csrf_token' and field.name != "submit" %}
+            <center>
+                <div>
+                    {{ field.label() }}
+                    {{ field() }}
+                    {% for error in field.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </center>
+        {% endfor %}
+        <center>
+            {{ form.submit(type="submit", class="btn btn-info") }}
+            <a class="btn btn-danger" href="/">Назад</a>
+        </center>
+    </form>
+
+{% endblock %}
