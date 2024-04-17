@@ -1,8 +1,9 @@
 import sqlalchemy
 from .db_session import SqlAlchemyBase
+from sqlalchemy_serializer import SerializerMixin
 
 
-class Product(SqlAlchemyBase):
+class Product(SqlAlchemyBase, SerializerMixin):
     """
     id              INT         ID товара
 

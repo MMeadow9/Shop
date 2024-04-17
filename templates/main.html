@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %} Главная страница магазина {% endblock %}
+
+{% block body %}
+    <header>
+        <nav class="navbar navbar-light bg-light">
+            <p>
+            <center>
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-warning" href="/update_card/1">Обновить карту</a>
+                    <a class="btn btn-primary" href="/view_advertisement">Посмотреть рекламу</a>
+                    <a class="btn btn-danger" href="/logout">{{ current_user.name }}</a>
+                {% else %}
+                    <a class="btn btn-success" href="/reg">Зарегистрироваться</a>
+                    <a class="btn btn-info" href="/login">Войти</a>
+                {% endif %}
+            </center>
+        </nav>
+    </header>
+
+    {% if current_user.is_authenticated %}
+        <header>
+            <nav class="navbar navbar-light bg-light">
+                <center>
+                    <h3>
+                        Ваш баланс: <b>{{ card.cash }}₽</b>, статус Вашей карты - <b>{{ card.status }}</b>
+                    </h3>
+                </center>
+            </nav>
+        </header>
+    {% endif %}
+
+
+    {% for product in data %}
+        <div class="col-sm-12 border rounded">
+            <h2>{{ product[1] }}</h2>
+            {{ product[2] }}
+            <h4>{{ product[3] }}</h4>
+            <h4>Цена - {{ product[4] }}₽</h4>
+            {% if product[-1] %}
+                {% if product[5] %}
+                    <h5>В наличии: {{ product[5] }}</h5>
+                {% else %}
+                    <h5>Нет в наличии</h5>
+                {% endif %}
+            {% else %}
+                <h5>Количество неограниченно</h5>
+            {% endif %}
+        </div>
+        <br>
+    {% endfor %}
+
+{% endblock %}

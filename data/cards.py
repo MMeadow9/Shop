@@ -1,8 +1,10 @@
 import sqlalchemy
 from .db_session import SqlAlchemyBase
+from sqlalchemy_serializer import SerializerMixin
 
 
-class Card(SqlAlchemyBase):
+
+class Card(SqlAlchemyBase, SerializerMixin):
     """
     id              INT         ID карты
 
