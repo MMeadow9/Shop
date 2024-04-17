@@ -55,9 +55,14 @@ def main():
 
     global_init("db/base.db")
 
+    data = []
+    for product in get("http://127.0.0.1:5000/api/products").json()["product"]:
+        seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
+        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
+
+    card = 0
+
+    return render_template('main.html', data=data, card=card)
 
 
-    return render_template("main.html")
-
-
-app.run(port=5000, host='127.0.0.1')
+app.run(port=5000, host='127.0.0.1', debug=True)
