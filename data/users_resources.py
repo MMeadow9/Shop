@@ -1,6 +1,6 @@
 from flask_restful import reqparse, abort, Resource
 from flask import abort, jsonify
-from data.db_session import create_session
+from data.db_session import create_session, global_init
 from data.users import User
 
 
@@ -65,6 +65,7 @@ class UserListResource(Resource):
 
     def post(self):
         data = parser.parse_args()
+        global_init("db/base.db")
         session = create_session()
         user = User()
         user.name = data["name"]

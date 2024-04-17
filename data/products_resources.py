@@ -23,10 +23,10 @@ def abort_if_user_not_found(product_id):
 
 
 class ProductResource(Resource):
-    def get(self, card_id):
-        abort_if_user_not_found(card_id)
+    def get(self, product_id):
+        abort_if_user_not_found(product_id)
         session = create_session()
-        product = session.query(Product).get(card_id)
+        product = session.query(Product).get(product_id)
         return jsonify({'product': product.to_dict(only=tuple(PRODUCTS_CHARACTERISTICS))})
 
     def delete(self, product_id):
