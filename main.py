@@ -11,7 +11,7 @@ from data.cards import *
 from data.users_resources import *
 from data.products_resources import *
 from data.cards_resources import *
-from forms.product import Product as FormProduct
+from forms.product import ProductCreate as FormProductCreate, ProductEdit as FormProductEdit
 from forms.users import RegisterForm as FormRegister, LoginForm as FormLogin
 
 
@@ -47,16 +47,6 @@ def logout():
 
 
 @app.route("/")
-def load_data():
-    """
-    Функция которая создаёт базу данных <db/base.db> если её не существует.
-    :return: Переводит пользователя на страницу [/main/]
-    """
-    LOAD_DATA()
-    return redirect("/main/")
-
-
-@app.route("/main/")
 def main():
     """
     Главная страница магазина со всеми товарами
@@ -75,7 +65,14 @@ def main():
     if current_user.is_authenticated:
         card = db_sess.query(Card).filter(Card.id == current_user.card).first()
 
-    return render_template('main.html', data=data, card=card)
+    db_sess = create_session()
+
+    current_user_id = current_user.id
+    ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
+
+    print(ids_sold_products)
+
+    return render_template('main.html', data=data, card=card, isd=ids_sold_products)
 
 
 @app.route("/reg", methods=['GET', 'POST'])
@@ -88,13 +85,13 @@ def reg():
     form = FormRegister()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация', form=form, message="Пароли не совпадают")
+            return render_template('register.html', form=form, message="Пароли не совпадают")
 
         users = get(f"http://127.0.0.1:5000/api/users").json()["user"]
         phone_numbers = [user["phone_number"] for user in users]
         emails = [user["email"] for user in users]
         if form.email.data in emails or form.phone_number.data in phone_numbers:
-            return render_template('register.html', title='Регистрация', form=form, message="Пользователь с такой почтой или номером телефона уже есть.")
+            return render_template('register.html', form=form, message="Пользователь с такой почтой или номером телефона уже есть.")
 
         db_sess = create_session()
 
@@ -122,7 +119,7 @@ def reg():
 
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('register.html', form=form)
 
 
 @app.route("/log", methods=["GET", "POST"])
@@ -140,9 +137,65 @@ def login():
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+    return render_template('login.html', form=form)
+
+
+@app.route("/create_product", methods=["GET", "POST"])
+@app.route("/product_create", methods=["GET", "POST"])
+def create_product():
+    form = FormProductCreate()
+    if form.validate_on_submit():
+        db_sess = create_session()
+        product = Product()
+        product.title = form.title.data
+        product.description = form.description.data
+        product.seller = current_user.id
+        product.price = form.price.data
+        product.count = form.count.data
+        product.is_limited = form.is_limited.data
+        db_sess.add(product)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('products_create.html', form=form)
+
+
+@login_required
+@app.route("/edit_product/<int:id>", methods=["GET", "POST"])
+@app.route("/product_edit/<int:id>", methods=["GET", "POST"])
+def edit_product(id):
+    form = FormProductEdit()
+    if request.method == "GET":
+
+        db_sess = create_session()
+        product = db_sess.query(Product).filter(Product.id == id, Product.seller == current_user.id).first()
+        if product:
+            form.title.data = product.title
+            form.description.data = product.description
+            form.price.data = product.price
+            form.count.data = product.count
+            form.is_limited.data = product.is_limited
+        else:
+             return "Кажется, у вас нет прав изменять этот товар..."
+    if form.validate_on_submit():
+        db_sess = create_session()
+        product = db_sess.query(Product).filter(Product.id == id, Product.seller == current_user.id).first()
+        if product:
+            product.title = form.title.data
+            product.description = form.description.data
+            product.seller = current_user.id
+            product.price = form.price.data
+            product.count = form.count.data
+            product.is_limited = form.is_limited.data
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+
+    return render_template('products_edit.html', form=form)
 
 
 global_init("db/base.db")
+
+LOAD_DATA()
 
 app.run(port=5000, host='127.0.0.1', debug=True)

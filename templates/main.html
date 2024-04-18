@@ -30,6 +30,16 @@
         </header>
     {% endif %}
 
+    {% if current_user.is_authenticated %}
+
+        <header>
+            <nav class="navbar navbar-light bg-light">
+                <p>
+                <a class="btn btn-success" href="/create_product">Выставить товар на продажу</a>
+            </nav>
+        </header>
+    {% endif %}
+
 
     {% for product in data %}
         <div class="col-sm-12 border rounded">
@@ -50,11 +60,16 @@
             {% if current_user.is_authenticated %}
                 <header>
                     <nav class="navbar navbar-light bg-light">
-                        <p>
-                        <a class="btn btn-secondary" href="/ask/{{ product[0] }}">Задать вопрос</a>
-                        <a class="btn btn-secondary" href="/review/{{ product[0] }}">Оценить товар</a>
+                    <p>
+                    {% if product[0] in isd %}
+                        <a class="btn btn-secondary" href="/edit_product/{{ product[0] }}">Изменить</a>
+                    {% else %}
+                        <a class="btn btn-dark" href="/ask/{{ product[0] }}">Задать вопрос</a>
+                        <a class="btn btn-dark" href="/review/{{ product[0] }}">Оценить товар</a>
+                    {% endif %}
                     </nav>
                 </header>
+
             {% endif %}
 
         </div>
