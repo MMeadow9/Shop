@@ -70,8 +70,6 @@ def main():
     current_user_id = current_user.id
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
-    print(ids_sold_products)
-
     return render_template('main.html', data=data, card=card, isd=ids_sold_products)
 
 
@@ -192,6 +190,23 @@ def edit_product(id):
             abort(404)
 
     return render_template('products_edit.html', form=form)
+
+
+@login_required
+@app.route("/view_advertisement")
+def advertisement():
+    added_cash = choice([1, 2, 3, 5, 10, 25]) * (10 ** choice([1, 1, 1, 2, 2, 3]))
+
+    db_sess = create_session()
+
+    if current_user.is_authenticated:
+        card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    card.cash = card.cash + added_cash
+
+    db_sess.commit()
+
+    return redirect("/")
 
 
 global_init("db/base.db")
