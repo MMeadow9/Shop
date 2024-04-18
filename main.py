@@ -39,6 +39,13 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
 @app.route("/")
 def load_data():
     """
@@ -61,7 +68,12 @@ def main():
         seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
         data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
 
+    db_sess = create_session()
+
     card = 0
+
+    if current_user.is_authenticated:
+        card = db_sess.query(Card).filter(Card.id == current_user.card).first()
 
     return render_template('main.html', data=data, card=card)
 
@@ -94,7 +106,6 @@ def reg():
         user.products = user.sold_products = ""
 
         user.set_password(form.password.data)
-        db_sess.add(user)
 
         card = Card()
         card.number = form.card_number.data
