@@ -244,6 +244,31 @@ def buy_product(product_id: int, count: int):
 
     return render_template("buying.html", message=message, ok=ok, card=card, link=link)
 
+@login_required
+@app.route("/buy/<int:product_id>/<int:count>")
+def buy(product_id: int, count: int):
+    db_sess = create_session()
+    product = db_sess.query(Product).filter(Product.id == product_id).first()
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    seller = product.seller
+    price = product.price
+
+    card.cash -= count * price
+    sellers_card = db_sess.query(Card).filter(Card.id == seller).first()
+    sellers_card.cash += count * price
+
+    product.count -= count
+
+    db_sess.commit()
+
+    return redirect("/")
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template("error_404.html")
+
 
 global_init("db/base.db")
 
