@@ -11,11 +11,10 @@ parser.add_argument('email', required=True)
 parser.add_argument('phone_number', required=True)
 parser.add_argument('password', required=True)
 parser.add_argument('products', required=True)
-parser.add_argument('sold_products', required=True)
 parser.add_argument('card', required=True, type=int)
 
 
-USERS_CHARACTERISTICS: list[str] = "id name surname email phone_number hashed_password products sold_products card".split()
+USERS_CHARACTERISTICS: list[str] = "id name surname email phone_number hashed_password products card".split()
 
 
 def abort_if_user_not_found(user_id):
@@ -50,7 +49,6 @@ class UserResource(Resource):
         user.email = data["email"]
         user.phone_number = data["phone_number"]
         user.products = data["products"]
-        user.sold_products = data["sold_products"]
         user.card = data["card"]
         user.set_password(data["password"])
         session.commit()
@@ -73,7 +71,6 @@ class UserListResource(Resource):
         user.email = data["email"]
         user.phone_number = data["phone_number"]
         user.products = data["products"]
-        user.sold_products = data["sold_products"]
         user.card = data["card"]
         user.set_password(data["password"])
         session.add(user)

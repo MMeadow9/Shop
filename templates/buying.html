@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %} Покупка? {% endblock %}
+
+{% block body %}
+    <header>
+        <nav class="navbar navbar-light bg-light">
+            <p>
+            <center>
+                <a class="btn btn-danger" href="/logout">{{ current_user.name }}</a>
+                <a class="btn btn-primary" href="/">В меню</a>
+            <br>
+            </center>
+        </nav>
+    </header>
+    <center>
+        <h4>Ваш баланс: <b>{{ card.cash }}₽</b>, статус Вашей карты - <b>{{ card.status }}</b></h4>
+        <h3>{{ message }}</h3>
+        <br>
+        {% if ok %}
+            <a class="btn btn-success" href="{{ link }}">Да</a>
+            <a class="btn btn-danger" href="/">Нет</a>
+        {% else %}
+            <a class="btn btn-info" href="/">ОК</a>
+        {% endif %}
+    </center>
+{% endblock %}

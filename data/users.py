@@ -22,8 +22,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     products        STR         Товары, которые имеет пользователь
                                  формата "id: count, id: count"
 
-    sold_products   STR         ID товаров, которые продаёт пользователь
-
     card            INT         ID привязанной к пользователю карты
     """
     __tablename__ = 'users'
@@ -35,7 +33,6 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     phone_number = sqlalchemy.Column(sqlalchemy.String)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     products = sqlalchemy.Column(sqlalchemy.String)
-    sold_products = sqlalchemy.Column(sqlalchemy.String)
     card = sqlalchemy.Column(sqlalchemy.Integer)
 
     def set_password(self, password):

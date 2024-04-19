@@ -67,7 +67,7 @@ def main():
 
     db_sess = create_session()
 
-    current_user_id = current_user.id
+    current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
     return render_template('main.html', data=data, card=card, isd=ids_sold_products)
@@ -160,7 +160,7 @@ def create_product():
 @login_required
 @app.route("/edit_product/<int:id>", methods=["GET", "POST"])
 @app.route("/product_edit/<int:id>", methods=["GET", "POST"])
-def edit_product(id):
+def edit_product(id: int):
     form = FormProductEdit()
     if request.method == "GET":
 
@@ -207,6 +207,42 @@ def advertisement():
     db_sess.commit()
 
     return redirect("/")
+
+
+@login_required
+@app.route("/buy_product/<int:product_id>/<int:count>")
+def buy_product(product_id: int, count: int):
+    """
+    :param product_id: ID товара для покупки
+    :param count:      Количество покупаемого товара
+    :return:
+    """
+    db_sess = create_session()
+    product = db_sess.query(Product).filter(Product.id == product_id).first()
+    price = product.price
+    title = product.title
+
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    message = ""  # Сообщение для пользователя
+    ok = None  # Флаг, если он принимает значение True, значит пользователь может купить товар(ы), если False - не может
+
+    if product.seller == current_user.id:  # Если пользователь пытается купить свой же товар
+        message = "Нельзя покупать свой товар."
+        ok = False
+    elif product.is_limited and product.count < count:  # Если кол-во товаров ограничено и пользователь хочет больше чем есть
+        message = f"У нас в наличии лишь {product.count} \"{title}\"."
+        ok = False
+    elif price * count > card.cash:  # Если у пользователя не хватает денег на покупку
+        message = "У Вас недостаточно денег на покупку всего этого."
+        ok = False
+    else:  # А если пользователь всё же может купить товар(ы), то спросим у него повторно хочет ли он сделать это
+        message = f"Вы действительно хотите купить {count} шт.  товара \"{title}\" за {price * count}₽ ?"
+        ok = True
+
+    link = f"/buy/{product_id}/{count}"
+
+    return render_template("buying.html", message=message, ok=ok, card=card, link=link)
 
 
 global_init("db/base.db")
