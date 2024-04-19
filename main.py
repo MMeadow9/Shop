@@ -273,6 +273,41 @@ def card(card_number):
 
     return render_template("cards.html", card=card, card_number=card_number)
 
+@login_required
+@app.route("/use_card/<int:card_number>")
+def use_card(card_number):
+    db_sess = create_session()
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    if str(card_number) in card.statuses:
+        card.status = {index + 1: type for index, type in enumerate("Usual Black Silver Gold Platinum".split())}[card_number]
+        db_sess.commit()
+        return redirect(f"/card/{card_number}")
+    else:
+        return render_template("error_other.html", message="Вы не можете использовать карту которой у Вас нет.")
+
+
+@login_required
+@app.route("/buy_card/<int:card_number>")
+def buy_card(card_number):
+    db_sess = create_session()
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    if card_number not in [1, 2, 3, 4, 5]:
+        return render_template("error_other.html", message="Вы не можете купить несуществующую карту.")
+    elif str(card_number) in card.statuses:
+        return render_template("error_other.html", message="Вы не можете купить уже имеющуюся карту.")
+    else:
+        card_price = {1: 0, 2: 250, 3: 800, 4: 1950, 5: 3500}[card_number]
+
+        if card_price > card.cash:
+            return render_template("error_other.html", message="У Вас не хватает денег на эту карту.")
+        else:
+            card.statuses += str(card_number)
+            card.cash -= card_price
+            db_sess.commit()
+            return redirect(f"/card/{card_number}")
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template("error_404.html")
