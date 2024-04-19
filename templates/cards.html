@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %} Карты {% endblock %}
+
+{% block body %}
+    <header>
+        <nav class="navbar navbar-light bg-light">
+            <p>
+            <center>
+                <a class="btn btn-danger" href="/logout">{{ current_user.name }}</a>
+                <a class="btn btn-primary" href="/">В меню</a>
+            <br>
+            </center>
+        </nav>
+    </header>
+    <center>
+        <h4>Ваш баланс: <b>{{ card.cash }}₽</b>, статус Вашей карты - <b>{{ card.status }}</b></h4>
+        <br>
+    </center>
+
+    {% if card_number == 1 %}
+        <center>
+            <h2>Карта со статусом <b>Usual</b></h2>
+            <h3>Цена: <b>0</b>₽</h3>
+            <h4>Кэшбэк от покупок: <b>0</b>%</h4>
+            <h4>Дополнительные проценты при просмотре рекламы: <b>0</b>%</h4>
+            {% if "1" in card.statuses %}
+                <h3>В наличии: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>В наличии: <font color="#660000">Нет</font></h3>
+            {% endif %}
+
+            {% if "Usual" == card.status %}
+                <h3>Используется: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>Используется: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            <br>
+            {% if "1" in card.statuses %}
+                <center>
+                    <a class="btn btn-dark" href="/card/5"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/use_card/1"><font size="3">Использовать</font></a>
+                    <a class="btn btn-dark" href="/card/2"><font size="4">→</font></a>
+                </center>
+            {% else %}
+                <center>
+                    <a class="btn btn-dark" href="/card/5"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/buy_card/1"><font size="3">Купить</font></a>
+                    <a class="btn btn-dark" href="/card/2"><font size="4">→</font></a>
+                </center>
+            {% endif %}
+        </center>
+
+    {% elif card_number == 2 %}
+        <center>
+            <h2>Карта со статусом <b>Black</b></h2>
+            <h3>Цена: <b>250</b>₽</h3>
+            <h4>Кэшбэк от покупок: <b>3</b>%</h4>
+            <h4>Дополнительные проценты при просмотре рекламы: <b>0</b>%</h4>
+            {% if "2" in card.statuses %}
+                <h3>В наличии: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>В наличии: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            {% if "Black" == card.status %}
+                <h3>Используется: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>Используется: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            <br>
+            {% if "2" in card.statuses %}
+                <center>
+                    <a class="btn btn-dark" href="/card/1"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/use_card/2"><font size="3">Использовать</font></a>
+                    <a class="btn btn-dark" href="/card/3"><font size="4">→</font></a>
+                </center>
+            {% else %}
+                <center>
+                    <a class="btn btn-dark" href="/card/1"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/buy_card/2"><font size="3">Купить</font></a>
+                    <a class="btn btn-dark" href="/card/3"><font size="4">→</font></a>
+                </center>
+            {% endif %}
+        </center>
+
+
+    {% elif card_number == 3 %}
+        <center>
+            <h2>Карта со статусом <b>Silver</b></h2>
+            <h3>Цена: <b>800</b>₽</h3>
+            <h4>Кэшбэк от покупок: <b>8</b>%</h4>
+            <h4>Дополнительные проценты при просмотре рекламы: <b>5</b>%</h4>
+            {% if "3" in card.statuses %}
+                <h3>В наличии: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>В наличии: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            {% if "Silver" == card.status %}
+                <h3>Используется: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>Используется: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            <br>
+            {% if "3" in card.statuses %}
+                <center>
+                    <a class="btn btn-dark" href="/card/2"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/use_card/3"><font size="3">Использовать</font></a>
+                    <a class="btn btn-dark" href="/card/4"><font size="4">→</font></a>
+                </center>
+            {% else %}
+                <center>
+                    <a class="btn btn-dark" href="/card/2"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/buy_card/3"><font size="3">Купить</font></a>
+                    <a class="btn btn-dark" href="/card/4"><font size="4">→</font></a>
+                </center>
+            {% endif %}
+        </center>
+
+    {% elif card_number == 4 %}
+        <center>
+            <h2>Карта со статусом <b>Gold</b></h2>
+            <h3>Цена: <b>1950</b>₽</h3>
+            <h4>Кэшбэк от покупок: <b>13</b>%</h4>
+            <h4>Дополнительные проценты при просмотре рекламы: <b>15</b>%</h4>
+            {% if "4" in card.statuses %}
+                <h3>В наличии: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>В наличии: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            {% if "Gold" == card.status %}
+                <h3>Используется: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>Используется: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            <br>
+            {% if "4" in card.statuses %}
+                <center>
+                    <a class="btn btn-dark" href="/card/3"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/use_card/4"><font size="3">Использовать</font></a>
+                    <a class="btn btn-dark" href="/card/5"><font size="4">→</font></a>
+                </center>
+            {% else %}
+                <center>
+                    <a class="btn btn-dark" href="/card/3"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/buy_card/4"><font size="3">Купить</font></a>
+                    <a class="btn btn-dark" href="/card/5"><font size="4">→</font></a>
+                </center>
+            {% endif %}
+        </center>
+
+
+    {% elif card_number == 5 %}
+        <center>
+            <h2>Карта со статусом <b>Platinum</b></h2>
+            <h3>Цена: <b>3500</b>₽</h3>
+            <h4>Кэшбэк от покупок: <b>20</b>%</h4>
+            <h4>Дополнительные проценты при просмотре рекламы: <b>30</b>%</h4>
+            {% if "5" in card.statuses %}
+                <h3>В наличии: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>В наличии: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            {% if "Platinum" == card.status %}
+                <h3>Используется: <font color="#006600">Да</font></h3>
+            {% else %}
+                <h3>Используется: <font color="#660000">Нет</font></h3>
+            {% endif %}
+            <br>
+            {% if "5" in card.statuses %}
+                <center>
+                    <a class="btn btn-dark" href="/card/4"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/use_card/5"><font size="3">Использовать</font></a>
+                    <a class="btn btn-dark" href="/card/1"><font size="4">→</font></a>
+                </center>
+            {% else %}
+                <center>
+                    <a class="btn btn-dark" href="/card/4"><font size="4">←</font></a>
+                    <a class="btn btn-dark" href="/buy_card/5"><font size="3">Купить</font></a>
+                    <a class="btn btn-dark" href="/card/1"><font size="4">→</font></a>
+                </center>
+            {% endif %}
+        </center>
+
+
+    {% endif %}
+
+
+{% endblock %}

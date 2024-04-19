@@ -265,6 +265,14 @@ def buy(product_id: int, count: int):
     return redirect("/")
 
 
+@login_required
+@app.route("/card/<int:card_number>")
+def card(card_number):
+    db_sess = create_session()
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    return render_template("cards.html", card=card, card_number=card_number)
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template("error_404.html")
