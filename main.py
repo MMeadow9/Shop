@@ -202,7 +202,7 @@ def advertisement():
     if current_user.is_authenticated:
         card = db_sess.query(Card).filter(Card.id == current_user.card).first()
 
-    card.cash = card.cash + added_cash
+    card.cash += int(added_cash * (1 + {"U": 0, "B": 0, "S": 0.05, "G": 0.15, "P": 0.3}[card.status[0]]))
 
     db_sess.commit()
 
@@ -254,7 +254,7 @@ def buy(product_id: int, count: int):
     seller = product.seller
     price = product.price
 
-    card.cash -= count * price
+    card.cash -= int(count * price * (1 - {"U": 0, "B": 0.03, "S": 0.08, "G": 0.13, "P": 0.2}[card.status[0]]))
     sellers_card = db_sess.query(Card).filter(Card.id == seller).first()
     sellers_card.cash += count * price
 
