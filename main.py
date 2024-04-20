@@ -65,8 +65,6 @@ def main():
     if current_user.is_authenticated:
         card = db_sess.query(Card).filter(Card.id == current_user.card).first()
 
-    db_sess = create_session()
-
     current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
@@ -315,6 +313,29 @@ def buy_card(card_number):
             card.cash -= card_price
             db_sess.commit()
             return redirect(f"/card/{card_number}")
+
+
+@login_required
+@app.route("/products")
+def products():
+    db_sess = create_session()
+
+    card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    products_ = current_user.products
+    dict_p = {int(product_.split(":")[0]): int(product_.split(":")[1]) for product_ in
+              products_.replace(" ", "").split(",") if products_}  # Словарь продуктов
+
+    data = []
+    for product in get("http://127.0.0.1:5000/api/products").json()["product"]:
+        if product["id"] in dict_p.keys():
+            seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
+
+            data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}",
+                         product["price"], dict_p[product["id"]]])
+
+    return render_template("products.html", data=data, card=card, dict_p=dict_p)
+
 
 
 @app.errorhandler(404)

@@ -8,6 +8,7 @@
             <center>
                 {% if current_user.is_authenticated %}
                     <a class="btn btn-warning" href="/card/1">Обновить карту</a>
+                    <a class="btn btn-success" href="/products">Купленные продукты</a>
                     <a class="btn btn-primary" href="/view_advertisement">Посмотреть рекламу</a>
                     <a class="btn btn-danger" href="/logout">{{ current_user.name }}</a>
                 {% else %}
