@@ -253,12 +253,19 @@ def buy(product_id: int, count: int):
 
     seller = product.seller
     price = product.price
+    products = current_user.products
+    dict_p = {int(product_.split(":")[0]): int(product_.split(":")[1]) for product_ in products.replace(" ", "").split(",") if products} # Словарь продуктов
 
     card.cash -= int(count * price * (1 - {"U": 0, "B": 0.03, "S": 0.08, "G": 0.13, "P": 0.2}[card.status[0]]))
     sellers_card = db_sess.query(Card).filter(Card.id == seller).first()
     sellers_card.cash += count * price
 
     product.count -= count
+
+    dict_p[product_id] = dict_p.get(product_id, 0) + count
+
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    user.products = str(dict_p)[1:][:-1]
 
     db_sess.commit()
 
@@ -272,6 +279,7 @@ def card(card_number):
     card = db_sess.query(Card).filter(Card.id == current_user.card).first()
 
     return render_template("cards.html", card=card, card_number=card_number)
+
 
 @login_required
 @app.route("/use_card/<int:card_number>")
