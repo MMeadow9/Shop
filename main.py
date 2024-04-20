@@ -308,6 +308,7 @@ def buy_card(card_number):
             db_sess.commit()
             return redirect(f"/card/{card_number}")
 
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template("error_404.html")
