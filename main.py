@@ -35,6 +35,16 @@ api.add_resource(ProductListResource, '/api/products')
 api.add_resource(ProductResource, '/api/products/<int:product_id>')
 
 
+def prunning(text, length):
+    if len(text) <= length:
+        return text
+    else:
+        ltext = text.split()
+        while len(" ".join(ltext)) > length:
+            ltext.pop()
+        return " ".join(ltext) + "..."
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = create_session()
@@ -70,7 +80,7 @@ def main():
     current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
-    return render_template('main.html', data=data, card=card, isd=ids_sold_products)
+    return render_template('main.html', data=data, card=card, isd=ids_sold_products, p=prunning)
 
 
 @app.route("/reg", methods=['GET', 'POST'])
@@ -337,6 +347,27 @@ def products():
                          product["price"], dict_p[product["id"]]])
 
     return render_template("products.html", data=data, card=card, dict_p=dict_p)
+
+
+@app.route("/product/<int:product_id>")
+def product(product_id):
+    data = []
+    for product in [get(f"http://127.0.0.1:5000/api/products/{product_id}").json()["product"]]:
+        print([product, product_id])
+        seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
+        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
+
+    db_sess = create_session()
+
+    card = 0
+
+    if current_user.is_authenticated:
+        card = db_sess.query(Card).filter(Card.id == current_user.card).first()
+
+    current_user_id = current_user.id if current_user.is_authenticated else -1
+    ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
+
+    return render_template('product.html', data=data, card=card, isd=ids_sold_products)
 
 
 @app.errorhandler(404)
