@@ -13,6 +13,8 @@ from data.products_resources import *
 from data.cards_resources import *
 from forms.product import ProductCreate as FormProductCreate, ProductEdit as FormProductEdit
 from forms.users import RegisterForm as FormRegister, LoginForm as FormLogin
+from forms.review import ReviewForm as FormReview
+from forms.ask import AskForm as FormAsk
 
 
 app = Flask(__name__)
@@ -335,7 +337,6 @@ def products():
                          product["price"], dict_p[product["id"]]])
 
     return render_template("products.html", data=data, card=card, dict_p=dict_p)
-
 
 
 @app.errorhandler(404)
