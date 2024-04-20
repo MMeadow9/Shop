@@ -353,7 +353,6 @@ def products():
 def product(product_id):
     data = []
     for product in [get(f"http://127.0.0.1:5000/api/products/{product_id}").json()["product"]]:
-        print([product, product_id])
         seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
         data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
 
