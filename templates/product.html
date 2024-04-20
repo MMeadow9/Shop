@@ -65,6 +65,49 @@
 
         </div>
         <br>
+
+        <h2><b>Вопросы:</b></h2>
+        {% for ask in asks %}
+        <div class="col-sm-12 border rounded">
+            <h3>{{ ask["comment"] }}</h3>
+
+            {% if current_user.is_authenticated %}
+                <header>
+                    <nav class="navbar navbar-light bg-light">
+                    <p>
+                    {% if product[0] in isd %}
+                        <a class="btn btn-secondary" href="/answer/ask/{{ ask['id'] }}">Ответить</a>
+                    {% endif %}
+                    </nav>
+                </header>
+
+            {% endif %}
+        </div>
+        <br>
+        {% endfor %}
+
+        <h2><b>Отзывы:</b></h2>
+        {% for review in reviews %}
+        <div class="col-sm-12 border rounded">
+            <h3>{{ review["comment"] }}</h3>
+            <h3>{{ review["mark"] }}/5</h3>
+
+            {% if current_user.is_authenticated %}
+                <header>
+                    <nav class="navbar navbar-light bg-light">
+                    <p>
+                    {% if product[0] in isd %}
+                        <a class="btn btn-secondary" href="/answer/review/{{ review['id'] }}">Ответить</a>
+                    {% endif %}
+                    </nav>
+                </header>
+
+            {% endif %}
+        </div>
+        <br>
+        {% endfor %}
     {% endfor %}
+
+
 
 {% endblock %}

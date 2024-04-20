@@ -15,6 +15,8 @@ from forms.product import ProductCreate as FormProductCreate, ProductEdit as For
 from forms.users import RegisterForm as FormRegister, LoginForm as FormLogin
 from forms.review import ReviewForm as FormReview
 from forms.ask import AskForm as FormAsk
+from data.asks import Ask
+from data.reviews import Review
 
 
 app = Flask(__name__)
@@ -33,6 +35,15 @@ api.add_resource(CardResource, '/api/cards/<int:card_id>')
 
 api.add_resource(ProductListResource, '/api/products')
 api.add_resource(ProductResource, '/api/products/<int:product_id>')
+
+
+def separation(text, count):
+    data = []
+    while text:
+        data += [text[-count:]]
+        text = text[:-count]
+
+    return " ".join(data[::-1])
 
 
 def prunning(text, length):
@@ -80,7 +91,7 @@ def main():
     current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
-    return render_template('main.html', data=data, card=card, isd=ids_sold_products, p=prunning)
+    return render_template('main.html', data=data, card=card, isd=ids_sold_products, p=prunning, s=separation, str=str)
 
 
 @app.route("/reg", methods=['GET', 'POST'])
@@ -205,7 +216,7 @@ def edit_product(id: int):
 @login_required
 @app.route("/view_advertisement")
 def advertisement():
-    added_cash = choice([1, 2, 3, 5, 10, 25]) * (10 ** choice([1, 1, 1, 2, 2, 3]))
+    added_cash = choice([1, 2, 3, 5, 10, 25]) * (10 ** choice([1, 2, 3, 4, 5, 5, 6, 7, 11, 11, 12, 12, 12]))
 
     db_sess = create_session()
 
@@ -351,12 +362,16 @@ def products():
 
 @app.route("/product/<int:product_id>")
 def product(product_id):
+    db_sess = create_session()
+
     data = []
     for product in [get(f"http://127.0.0.1:5000/api/products/{product_id}").json()["product"]]:
         seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
-        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
-
-    db_sess = create_session()
+        asks = db_sess.query(Ask).filter(Ask.id.in_(list(map(int, set(product["asks"].split()))))) if product["asks"] else []
+        reviews = db_sess.query(Review).filter(Review.id.in_(list(map(int, set(product["reviews"].split()))))) if product["reviews"] else []
+        print([reviews])
+        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}",
+                     product["price"], product["count"], product["is_limited"]])
 
     card = 0
 
@@ -366,7 +381,52 @@ def product(product_id):
     current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
-    return render_template('product.html', data=data, card=card, isd=ids_sold_products)
+    return render_template('product.html', data=data, card=card, isd=ids_sold_products, asks=asks, reviews=reviews)
+
+
+@login_required
+@app.route("/ask/<int:product_id>", methods=("GET POST".split()))
+def ask(product_id):
+    form = FormAsk()
+    if form.validate_on_submit():
+        db_sess = create_session()
+
+        ask = Ask()
+
+        ask.comment = form.comment.data
+
+        product = db_sess.query(Product).filter(Product.id == product_id).first()
+
+        product.asks = " ".join((product.asks.split() if product.asks else []) + [str(product_id)])
+
+        db_sess.add(ask)
+        db_sess.commit()
+
+        return redirect('/')
+    return render_template('ask.html', form=form)
+
+
+@login_required
+@app.route("/review/<int:product_id>", methods=("GET POST".split()))
+def review(product_id):
+    form = FormReview()
+    if form.validate_on_submit():
+        db_sess = create_session()
+
+        review = Review()
+
+        review.comment = form.comment.data
+        review.mark = form.mark.data
+
+        product = db_sess.query(Product).filter(Product.id == product_id).first()
+
+        product.reviews = " ".join((product.reviews.split() if product.reviews else []) + [str(product_id)])
+
+        db_sess.add(review)
+        db_sess.commit()
+
+        return redirect('/')
+    return render_template('review.html', form=form)
 
 
 @app.errorhandler(404)

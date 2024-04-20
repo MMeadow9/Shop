@@ -11,8 +11,10 @@ parser.add_argument('seller', required=True, type=int)
 parser.add_argument('price', required=True, type=int)
 parser.add_argument('count', required=True, type=int)
 parser.add_argument('is_limited', required=True, type=bool)
+parser.add_argument('asks', required=True)
+parser.add_argument('reviews', required=True)
 
-PRODUCTS_CHARACTERISTICS: list[str] = "id title description seller price count is_limited".split()
+PRODUCTS_CHARACTERISTICS: list[str] = "id title description seller price count is_limited asks reviews".split()
 
 
 def abort_if_user_not_found(product_id):
@@ -48,6 +50,8 @@ class ProductResource(Resource):
         product.price = data["price"]
         product.count = data["count"]
         product.is_limited = data["is_limited"]
+        product.asks = data["asks"]
+        product.reviews = data["reviews"]
         session.commit()
         return jsonify({'id': product.id})
 
@@ -68,6 +72,8 @@ class ProductListResource(Resource):
         product.price = data["price"]
         product.count = data["count"]
         product.is_limited = data["is_limited"]
+        product.asks = data["asks"]
+        product.reviews = data["review"]
         session.add(product)
         session.commit()
         return jsonify({'id': product.id})

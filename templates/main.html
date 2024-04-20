@@ -24,7 +24,7 @@
             <nav class="navbar navbar-light bg-light">
                 <center>
                     <h3>
-                        Ваш баланс: <b>{{ card.cash }}₽</b>, статус Вашей карты - <b>{{ card.status }}</b>
+                        Ваш баланс: <b>{{ s(str(card.cash), 3) }}₽</b>, статус Вашей карты - <b>{{ card.status }}</b>
                     </h3>
                 </center>
             </nav>

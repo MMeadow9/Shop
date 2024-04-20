@@ -18,6 +18,10 @@ class Product(SqlAlchemyBase, SerializerMixin):
     count           INT         Кол-во имеющегося товара
 
     is_limited      BOOL        Ограничено ли кол-во товара
+
+    asks            STR         ID вопросов
+
+    reviews         STR         ID отзывов
     """
     __tablename__ = 'products'
 
@@ -28,3 +32,5 @@ class Product(SqlAlchemyBase, SerializerMixin):
     price = sqlalchemy.Column(sqlalchemy.Integer)
     count = sqlalchemy.Column(sqlalchemy.Integer)
     is_limited = sqlalchemy.Column(sqlalchemy.Boolean)
+    asks = sqlalchemy.Column(sqlalchemy.String)
+    reviews = sqlalchemy.Column(sqlalchemy.String)
