@@ -15,4 +15,4 @@ class Review(SqlAlchemyBase):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     comment = sqlalchemy.Column(sqlalchemy.String)
     mark = sqlalchemy.Column(sqlalchemy.Integer)
-    answers = sqlalchemy.Column(sqlalchemy.Integer)
+    answers = sqlalchemy.Column(sqlalchemy.String)

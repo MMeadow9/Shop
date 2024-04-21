@@ -87,7 +87,7 @@ def main():
         if reviews:
             marks = []
             for review_id in set(reviews.split()):
-                review = db_sess.query(Review).filter(Review.id == review_id).first()
+                review = db_sess.query(Review).filter(Review.id == int(review_id)).first()
                 marks.append(review.mark)
             amean = sum(marks) / len(marks)  # Arithmetic MEAN
             product_data.append(str(round(amean, 2) if amean % 1 else int(amean)))
@@ -142,9 +142,9 @@ def reg():
         card.code = form.card_code.data
         card.cash = 0
         card.status = "Usual"
-        card.status = "1"
+        card.statuses = "1"
 
-        user.card = card.id
+        user.card = len(db_sess.query(Card).all()) + 1
 
         db_sess.add(user)
         db_sess.add(card)
@@ -229,7 +229,7 @@ def edit_product(id: int):
 @login_required
 @app.route("/view_advertisement")
 def advertisement():
-    added_cash = choice([1, 2, 3, 5, 10, 25]) * (10 ** choice([1, 2, 3, 4, 5, 5, 6, 7, 11, 11, 12, 12, 12]))
+    added_cash = choice([1, 2, 3, 5, 10, 25]) * (10 ** choice([0, 0, 0, 0, 1, 1, 1, 2, 2, 3]))
 
     db_sess = create_session()
 
@@ -397,6 +397,22 @@ def product(product_id):
 
         data.append(product_data)
 
+    asks_ = []
+    for ask in asks:
+        answers_ = []
+        if ask.answers:
+            for answer_ in db_sess.query(Answer).filter(Answer.id.in_(set(map(int, ask.answers.split())))):
+                answers_.append(answer_.comment)
+        asks_.append([ask.comment, answers_, ask.id])
+
+    reviews_ = []
+    for review in reviews:
+        answers_ = []
+        if review.answers:
+            for answer_ in db_sess.query(Answer).filter(Answer.id.in_(set(map(int, review.answers.split())))):
+                answers_.append(answer_.comment)
+        reviews_.append([review.comment, review.mark, answers_, review.id])
+
     card = 0
 
     if current_user.is_authenticated:
@@ -405,7 +421,7 @@ def product(product_id):
     current_user_id = current_user.id if current_user.is_authenticated else -1
     ids_sold_products = [product.id for product in db_sess.query(Product).filter(Product.seller == current_user_id)]
 
-    return render_template('product.html', data=data, card=card, isd=ids_sold_products, asks=asks, reviews=reviews)
+    return render_template('product.html', data=data, card=card, isd=ids_sold_products, asks=asks_, reviews=reviews_)
 
 
 @login_required
@@ -421,7 +437,9 @@ def ask(product_id):
 
         product = db_sess.query(Product).filter(Product.id == product_id).first()
 
-        product.asks = " ".join((product.asks.split() if product.asks else []) + [str(product_id)])
+        count_ask = len(db_sess.query(Ask).all())
+
+        product.asks = " ".join((product.asks.split() if product.asks else []) + [str(count_ask + 1)])
 
         db_sess.add(ask)
         db_sess.commit()
@@ -444,13 +462,59 @@ def review(product_id):
 
         product = db_sess.query(Product).filter(Product.id == product_id).first()
 
-        product.reviews = " ".join((product.reviews.split() if product.reviews else []) + [str(product_id)])
+        count_reviews = len(db_sess.query(Review).all())
+
+        product.reviews = " ".join((product.reviews.split() if product.reviews else []) + [str(count_reviews + 1)])
 
         db_sess.add(review)
         db_sess.commit()
 
         return redirect('/')
     return render_template('review.html', form=form)
+
+
+@login_required
+@app.route("/answer/ask/<int:ask_id>", methods=["GET", "POST"])
+def answer_ask(ask_id):
+    form = FormAnswer()
+    if form.validate_on_submit():
+        db_sess = create_session()
+
+        answer = Answer()
+
+        answer.comment = form.comment.data
+
+        ask = db_sess.query(Ask).filter(Ask.id == ask_id).first()
+
+        ask.answers = " ".join((ask.answers.split() if ask.answers else []) + [str(ask_id)])
+
+        db_sess.add(answer)
+        db_sess.commit()
+
+        return redirect('/')
+    return render_template('answer.html', form=form)
+
+
+@login_required
+@app.route("/answer/review/<int:review_id>", methods=["GET", "POST"])
+def answer_review(review_id):
+    form = FormAnswer()
+    if form.validate_on_submit():
+        db_sess = create_session()
+
+        answer = Answer()
+
+        answer.comment = form.comment.data
+
+        review = db_sess.query(Review).filter(Review.id == review_id).first()
+
+        review.answers = " ".join((review.answers.split() if review.answers else []) + [str(review_id)])
+
+        db_sess.add(answer)
+        db_sess.commit()
+
+        return redirect('/')
+    return render_template('answer.html', form=form)
 
 
 @app.errorhandler(404)

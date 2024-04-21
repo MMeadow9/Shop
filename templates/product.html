@@ -71,19 +71,23 @@
         <h2><b>Вопросы:</b></h2>
         {% for ask in asks %}
         <div class="col-sm-12 border rounded">
-            <h3>{{ ask["comment"] }}</h3>
+            <h4>{{ ask[0] }}</h4>
 
             {% if current_user.is_authenticated %}
                 <header>
                     <nav class="navbar navbar-light bg-light">
                     <p>
                     {% if product[0] in isd %}
-                        <a class="btn btn-secondary" href="/answer/ask/{{ ask['id'] }}">Ответить</a>
+                        <a class="btn btn-secondary" href="/answer/ask/{{ ask[-1] }}">Ответить</a>
                     {% endif %}
                     </nav>
                 </header>
-
             {% endif %}
+            <br>
+            <h4>Ответы:</h4>
+            {% for answer in ask[1] %}
+                <h5>{{ answer }}</h5>
+            {% endfor %}
         </div>
         <br>
         {% endfor %}
@@ -91,20 +95,25 @@
         <h2><b>Отзывы:</b></h2>
         {% for review in reviews %}
         <div class="col-sm-12 border rounded">
-            <h3>{{ review["comment"] }}</h3>
-            <h3>{{ review["mark"] }}/5</h3>
+            <h4>{{ review[0] }}</h4>
+            <h3>Оценка: <b>{{ review[1] }}</b>/5</h3>
 
             {% if current_user.is_authenticated %}
                 <header>
                     <nav class="navbar navbar-light bg-light">
                     <p>
                     {% if product[0] in isd %}
-                        <a class="btn btn-secondary" href="/answer/review/{{ review['id'] }}">Ответить</a>
+                        <a class="btn btn-secondary" href="/answer/review/{{ review[-1] }}">Ответить</a>
                     {% endif %}
                     </nav>
                 </header>
-
             {% endif %}
+
+            <br>
+            <h4>Ответы:</h4>
+            {% for answer in review[2] %}
+                <h5>{{ answer }}</h5>
+            {% endfor %}
         </div>
         <br>
         {% endfor %}
