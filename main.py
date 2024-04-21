@@ -17,6 +17,8 @@ from forms.review import ReviewForm as FormReview
 from forms.ask import AskForm as FormAsk
 from data.asks import Ask
 from data.reviews import Review
+from data.answers import Answer
+from forms.answer import AnswerForm as FormAnswer
 
 
 app = Flask(__name__)
