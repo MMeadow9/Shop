@@ -75,13 +75,24 @@ def main():
     Главная страница магазина со всеми товарами
     :return:
     """
+    db_sess = create_session()
 
     data = []
     for product in get("http://127.0.0.1:5000/api/products").json()["product"]:
         seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
-        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]])
+        product_data = [product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}", product["price"], product["count"], product["is_limited"]]
+        reviews = product["reviews"]
+        if reviews:
+            marks = []
+            for review_id in set(reviews.split()):
+                review = db_sess.query(Review).filter(Review.id == review_id).first()
+                marks.append(review.mark)
+            amean = sum(marks) / len(marks)  # Arithmetic MEAN
+            product_data.append(str(round(amean, 2) if amean % 1 else int(amean)))
+        else:
+            product_data.append("Оценок нет")
 
-    db_sess = create_session()
+        data.append(product_data)
 
     card = 0
 
@@ -369,9 +380,20 @@ def product(product_id):
         seller: dict = get(f"http://127.0.0.1:5000/api/users/{product['seller']}").json()["user"]
         asks = db_sess.query(Ask).filter(Ask.id.in_(list(map(int, set(product["asks"].split()))))) if product["asks"] else []
         reviews = db_sess.query(Review).filter(Review.id.in_(list(map(int, set(product["reviews"].split()))))) if product["reviews"] else []
-        print([reviews])
-        data.append([product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}",
-                     product["price"], product["count"], product["is_limited"]])
+        product_data = [product["id"], product["title"], product["description"], f"{seller['name']} {seller['surname']}",
+                     product["price"], product["count"], product["is_limited"]]
+
+        if reviews:
+            marks = []
+            for review_id in set(reviews):
+                review = db_sess.query(Review).filter(Review.id == review_id.id).first()
+                marks.append(review.mark)
+            amean = sum(marks) / len(marks)  # Arithmetic MEAN
+            product_data.append(str(round(amean, 2) if amean % 1 else int(amean)))
+        else:
+            product_data.append("Оценок нет")
+
+        data.append(product_data)
 
     card = 0
 

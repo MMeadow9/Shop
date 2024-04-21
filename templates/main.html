@@ -48,7 +48,8 @@
             {{ p(product[2], 150) }}
             <h4>{{ product[3] }}</h4>
             <h4>Цена - {{ product[4] }}₽</h4>
-            {% if product[-1] %}
+            <h4>Рейтинг - {{ product[7] }}</h4>
+            {% if product[6] %}
                 {% if product[5] %}
                     <h5>В наличии: {{ product[5] }}</h5>
                 {% else %}
